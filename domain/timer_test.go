@@ -1,4 +1,4 @@
-package timer
+package domain
 
 import (
 	"sync"
@@ -68,6 +68,8 @@ func TestTimer_Blocked(t1 *testing.T) {
 			if err != nil {
 				t1.Errorf("NewTimer() error = %v", err)
 			}
+
+			t.Start()
 			// delay enough to await for NewTimer to run
 			time.Sleep(1 * time.Millisecond)
 			if got := t.Blocked(); got != tt.want {
@@ -120,7 +122,7 @@ func TestTimer_Reset(t1 *testing.T) {
 				resetCh:  tt.fields.resetCh,
 				duration: tt.fields.duration,
 			}
-			go t.run()
+			t.Start()
 			//time.Sleep(100 * time.Millisecond)
 			t.Reset()
 			//time.Sleep(100 * time.Millisecond)
@@ -177,6 +179,7 @@ func TestTimer_Stop(t1 *testing.T) {
 				stopCh:   tt.fields.stopCh,
 				duration: tt.fields.duration,
 			}
+			t.Start()
 			t.Stop()
 			// delay 1 millisecond to await for Stop() to run
 			time.Sleep(100 * time.Millisecond)

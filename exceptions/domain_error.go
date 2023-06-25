@@ -1,4 +1,4 @@
-package timer
+package exceptions
 
 // domainError is a custom error type
 type domainError struct {
@@ -12,3 +12,5 @@ func (e *domainError) Error() string {
 
 // ErrInvalidDuration is returned when the duration is longer than 6 hours
 var ErrInvalidDuration = &domainError{Err: "duration exceeds 6 hours"}
+
+var ErrInvalidTimer = &domainError{Err: "timer has not been instantiated"}

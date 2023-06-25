@@ -1,9 +1,18 @@
-package timer
+//go:generate mockgen -source timer.go -destination mock/timer_mock.go -package mocks
+package domain
 
 import (
+	"github.com/sosalejandro/timer/exceptions"
 	"sync"
 	"time"
 )
+
+type BaseTimer interface {
+	Start()
+	Reset()
+	Blocked() bool
+	Stop()
+}
 
 type Timer struct {
 	// mu is a mutex that protects the blocked field
@@ -21,7 +30,7 @@ type Timer struct {
 // NewTimer creates a new timer, as long as the duration is less than 6 hours, otherwise it returns an error.
 func NewTimer(duration time.Duration) (*Timer, error) {
 	if duration > 6*time.Hour {
-		return nil, ErrInvalidDuration
+		return nil, exceptions.ErrInvalidDuration
 	}
 
 	t := &Timer{
@@ -29,8 +38,11 @@ func NewTimer(duration time.Duration) (*Timer, error) {
 		stopCh:   make(chan struct{}),
 		duration: duration,
 	}
-	go t.run()
 	return t, nil
+}
+
+func (t *Timer) Start() {
+	go t.run()
 }
 
 // run is a goroutine that runs the timer and blocks when the timer expires.
