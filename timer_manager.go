@@ -15,31 +15,44 @@ func NewTimerManager(timer domain.BaseTimer) *TimerManager {
 	}
 }
 
-func (tm *TimerManager) StartTimer() error {
-	if tm.timer != nil {
-		tm.timer.Start()
-		return nil
+func (tm *TimerManager) StartTimer(cb domain.Executable) error {
+	if tm.timer == nil {
+		return exceptions.ErrInvalidTimer
 	}
 
-	return exceptions.ErrInvalidTimer
+	tm.timer.Start()
+
+	if cb != nil {
+		cb.ExecuteAtStart()
+	}
+
+	return nil
 }
 
-func (tm *TimerManager) StopTimer() error {
-	if tm.timer != nil {
-		tm.timer.Stop()
-		return nil
+func (tm *TimerManager) StopTimer(cb domain.Executable) error {
+	if tm.timer == nil {
+		return exceptions.ErrInvalidTimer
 	}
 
-	return exceptions.ErrInvalidTimer
+	tm.timer.Stop()
+	if cb != nil {
+		cb.ExecuteAtStop()
+	}
+
+	return nil
 }
 
-func (tm *TimerManager) ResetTimer() error {
-	if tm.timer != nil {
-		tm.timer.Reset()
-		return nil
+func (tm *TimerManager) ResetTimer(cb domain.Executable) error {
+	if tm.timer == nil {
+		return exceptions.ErrInvalidTimer
 	}
 
-	return exceptions.ErrInvalidTimer
+	tm.timer.Reset()
+	if cb != nil {
+		cb.ExecuteAtReset()
+	}
+
+	return nil
 }
 
 func (tm *TimerManager) IsTimerBlocked() (bool, error) {
@@ -47,5 +60,5 @@ func (tm *TimerManager) IsTimerBlocked() (bool, error) {
 		return tm.timer.Blocked(), nil
 	}
 
-	return false, exceptions.ErrInvalidDuration
+	return false, exceptions.ErrInvalidTimer
 }
